@@ -1,6 +1,10 @@
 import sys
 import sqlite3
 import random
+#import keras
+from tensorflow.keras.preprocessing.image import img_to_array, load_img
+import numpy as np
+from keras.models import load_model
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QLabel, QDesktopWidget, QFileDialog, QSpacerItem, QSizePolicy, QHBoxLayout, QScrollArea
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5 import QtCore
@@ -28,7 +32,7 @@ class CardWidget(QWidget):
 
         cardFormat.addWidget(speciesLabel)
         cardFormat.addWidget(descriptionLabel)
-        cardFormat.addWidget(speciesLabel)
+        cardFormat.addWidget(quantityLabel)
 
         layout.addLayout(cardFormat)
         self.setLayout(layout)
@@ -63,12 +67,13 @@ class MyGarden(QMainWindow):
         self.layout.addWidget(self.scrollBox)
 
         # fills cards from database
-        self.fillScrollBoxFromDB()
+        #self.fillScrollBoxFromDB()
+        self.fillcardsManual()
 
     # creates a new card to add to the scroll area with the right info about a bird
     def addCardToScrollBox(self, Name, Picture, Description, Quantity):
-        # Dummy data for now
-        icon = QIcon(Picture)  # Your icon
+
+        icon = QIcon(Picture)
         name = Name
         description = Description
         quantity = Quantity
@@ -226,9 +231,17 @@ class MainWindow(QMainWindow):
         self.MyGarden.show()
 
     def classifyImage(self,imagePath):
-        return "Streamer Duck"
 
+        model = load_model('model.h5')
+        preprocessed_image = self.preprocess_image(imagePath, target_size=(224, 224))
+        predictions = model.predict(preprocessed_image)
 
+        return predictions
+    def preprocess_image(self,imagepath,targetsize):
+        img = load_img(imagepath, target_size=targetsize)
+        img_array = img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)  # Model expects a batch
+        return img_array
 
 
 if __name__ == "__main__":
