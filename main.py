@@ -67,8 +67,8 @@ class MyGarden(QMainWindow):
         self.layout.addWidget(self.scrollBox)
 
         # fills cards from database
-        #self.fillScrollBoxFromDB()
-        self.fillcardsManual()
+
+        self.fillScrollBoxFromDB()
 
     # creates a new card to add to the scroll area with the right info about a bird
     def addCardToScrollBox(self, Name, Picture, Description, Quantity):
@@ -233,15 +233,15 @@ class MainWindow(QMainWindow):
     def classifyImage(self,imagePath):
 
         model = load_model('model.h5')
-        preprocessed_image = self.preprocess_image(imagePath, target_size=(224, 224))
-        predictions = model.predict(preprocessed_image)
-
-        return predictions
+        image = self.preprocess_image(imagePath, target_size=(224, 224))
+        prediction = model.predict(image)
+        return prediction
+    #ensures the image is in the expected format for the model to classify 
     def preprocess_image(self,imagepath,targetsize):
-        img = load_img(imagepath, target_size=targetsize)
-        img_array = img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0)  # Model expects a batch
-        return img_array
+        image = load_img(imagepath, target_size=targetsize)
+        imageAsArray = img_to_array(image)
+        imageAsArray = np.expand_dims(imageAsArray, axis=0)  # Model expects a batch
+        return imageAsArray
 
 
 if __name__ == "__main__":
